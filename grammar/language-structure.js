@@ -57,11 +57,15 @@ module.exports = {
     };
   },
   'call': function(args) {
-    return {
-      'type': 'call',
-      'name': args[0],
-      'arguments': args[2],
-    };
+    if (args[2].length === 0) {
+      return args[0]; // treat it as an identifier
+    } else {
+      return {
+        'type': 'call',
+        'name': args[0],
+        'arguments': args[2],
+      };
+    }
   },
   'parameterList': secondMap,
   'argumentList': secondMap,
@@ -89,7 +93,7 @@ module.exports = {
     var identifier = args[2]; 
     var value = args[6]; 
     return {
-      'type': 'declaration', 'identifier': identifier, 'value': value
+      'type': 'declaration', 'name': identifier, 'value': value
     };
   },
 
@@ -109,25 +113,28 @@ module.exports = {
   },
   'numExpression': chainedBinaryOperators,
   'term': chainedBinaryOperators,
-  'group': [null, null, third],
+  'group': [null, null, null, third],
 
   // keywords
   'true': function(args) { return true; },
   'false': function(args) { return false; },
 
   // basic helpers
-  'number': function(args) {
-    var digits = [args[0]].concat(args[1]);
-    var sum = 0;
-    for (var i = 0; i < digits.length; i++) {
-      var place = digits.length - i - 1;
-      sum += digits[i] * Math.pow(10, place);
+  'number': [
+    function(args) {
+      var digits = [args[0]].concat(args[1]);
+      var sum = 0;
+      for (var i = 0; i < digits.length; i++) {
+        var place = digits.length - i - 1;
+        sum += digits[i] * Math.pow(10, place);
+      }
+      return sum;
     }
-    return sum;
-  },
+  ],
 
   // fundamental building blocks (terminals)
   'space': function(space) {return ' ';},
+  'zero': function(number) {return parseInt(number);},
   'nonzeroDigit': function(number) {return parseInt(number);},
   'digit': function(number) {return parseInt(number);}
 };

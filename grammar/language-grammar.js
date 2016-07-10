@@ -104,7 +104,7 @@ module.exports = {
   'boolTerm': 'boolGroup, { andBoolGroup }',
   'andBoolGroup': 'space, and, space, boolGroup',
   'boolGroup': '\
-    boolRelation | identifier | true | false \
+    boolRelation | call | identifier | true | false \
   ',
   'boolRelation': '\
     numExpression, [ boolOpNumExpression ] \
@@ -118,7 +118,7 @@ module.exports = {
   'term': 'group, { timesGroup }',
   'timesGroup': '[ space ], times, [ space ], group',
   'group': '\
-    number | identifier | \
+    number | call | identifier | \
     left, [ space ], expression, [ space ], right \
   ',
   
@@ -154,7 +154,7 @@ module.exports = {
     }
     return false;
   },
-  'number': 'nonzeroDigit, { digit }',
+  'number': 'nonzeroDigit, { digit } | zero',
   'extendedSpace': 'spaceNewlineSpace+ | space',
   'spaceNewlineSpace': '[ space ], newline, [ space ]',
   'space': 'blankChar, { blankChar }',
@@ -202,6 +202,15 @@ module.exports = {
 
     var letter = tokens[0];
     if (isLetter(letter)) {
+      ret.newTokens = tokens.slice(1);
+      ret.structure = tokens[0];
+      return true;
+    } else return false;
+  },
+  'zero': function(tokens, ret) {
+    if (tokens.length < 1) return false;
+
+    if (isDigit(tokens[0]) && tokens[0] === '0') {
       ret.newTokens = tokens.slice(1);
       ret.structure = tokens[0];
       return true;
