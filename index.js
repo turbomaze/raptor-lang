@@ -20,15 +20,22 @@ var interpreter = new Interpreter(langGrammar, langStructure);
 
 var goal = 'program';
 var input = `
+
 triple => x {
-  return 3*x
+  addToItselfThrice => x {
+    return x + x + x
+  }
+
+  return addToItselfThrice -> x
+}
+
+double => y {
+  return 2 * y
 }
 
 a = 10
-b = a * 16 + 4
-a = 6 * b * 2 + 5
-b = 1974
-c = a < b
+b = triple -> double -> a
+return b
 `;
 
 

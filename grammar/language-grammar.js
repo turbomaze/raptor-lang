@@ -14,7 +14,7 @@ var KEYWORDS = {
   andWord: 'and',
   orWord: 'or',
   trueWord: 'true',
-  falseWord: 'false',
+  falseWord: 'false'
 };
 
 // helper functions
