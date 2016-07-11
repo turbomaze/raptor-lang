@@ -22,11 +22,7 @@ var goal = 'program';
 var input = `
 
 triple => x {
-  addToItselfThrice => x {
-    return x + x + x
-  }
-
-  return addToItselfThrice -> x
+  return (double -> x) + x
 }
 
 double => y {
@@ -34,8 +30,9 @@ double => y {
 }
 
 a = 10
-b = triple -> double -> a
-return b
+b = triple -> a
+a = 9 * b + b
+return a
 `;
 
 
