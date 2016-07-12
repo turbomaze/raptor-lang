@@ -100,8 +100,9 @@ module.exports = {
     // general expressions (boolean and numeric)
     'expression': 'boolTerm, { orBoolTerm }',
     'orBoolTerm': 'space, or, space, boolTerm',
-    'boolTerm': 'boolGroup, { andBoolGroup }',
-    'andBoolGroup': 'space, and, space, boolGroup',
+    'boolTerm': 'notBoolGroup, { andNotBoolGroup }',
+    'andNotBoolGroup': 'space, and, space, notBoolGroup',
+    'notBoolGroup': '[ not ], boolGroup',
     'boolGroup': '\
       boolRelation | call | identifier | true | false \
     ',
@@ -112,10 +113,10 @@ module.exports = {
       [ space ], binBoolOp, [ space ], numExpression \
     ',
     'binBoolOp': 'lteq | gteq | lt | gt | eqeq | notEq',
-    'numExpression': 'term, { plusTerm }',
-    'plusTerm': '[ space ], plus, [ space ], term',
-    'term': 'group, { timesGroup }',
-    'timesGroup': '[ space ], times, [ space ], group',
+    'numExpression': 'term, { weakNumOpTerm }',
+    'weakNumOpTerm': '[ space ], weakNumOp, [ space ], term',
+    'term': 'group, { strongNumOpGroup }',
+    'strongNumOpGroup': '[ space ], strongNumOp, [ space ], group',
     'group': '\
       number | call | identifier | \
       left, [ space ], expression, [ space ], right \
@@ -152,7 +153,7 @@ module.exports = {
       }
       return false;
     },
-    'number': 'nonzeroDigit, { digit } | zero',
+    'number': '[ negative ], nonzeroDigit, { digit } | zero',
     'extendedSpace': 'spaceNewlineSpace+ | space',
     'spaceNewlineSpace': '[ space ], newline, [ space ]',
     'space': 'blankChar, { blankChar }',
@@ -172,14 +173,23 @@ module.exports = {
     // fundamental building blocks (terminals)
     'fatArrow': getStringFunc('=>'),
     'arrow': getStringFunc('->'),
+
     'eqeq': getStringFunc('=='),
     'notEq': getStringFunc('!='),
+    'not': getStringFunc('!'),
     'lt': getCharFunc('<'),
     'gt': getCharFunc('>'),
     'lteq': getStringFunc('<='),
     'gteq': getStringFunc('>='),
+
+    'weakNumOp': 'plus | minus',
+    'strongNumOp': 'times | divide',
     'plus': getCharFunc('+'),
+    'minus': getCharFunc('-'),
     'times': getCharFunc('*'),
+    'divide': getCharFunc('/'),
+    'negative': getCharFunc('-'),
+
     'left': getCharFunc('('),
     'right': getCharFunc(')'),
     'leftBrace': getCharFunc('{'),

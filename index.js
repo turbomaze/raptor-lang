@@ -21,21 +21,23 @@ var interpreter = new Interpreter(langGrammar, langStructure);
 var goal = 'program';
 var input = `
 
-triple => x {
-  return (double -> x) + x
+fib => n {
+  n == 0 {
+    return 0
+  }
+
+  n == 1 {
+    return 1
+  }
+
+  return (fib -> n - 1) + (fib -> n - 2)
 }
 
-double => y {
-  return 2 * y
+double => x {
+  return x * 2
 }
 
-a = 7
-b = a
-a >= 10 {
-  b = double -> 51
-}
-b = a * 131
-return b
+return fib -> double -> 10
 `;
 
 

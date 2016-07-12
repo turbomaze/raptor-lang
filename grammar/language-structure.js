@@ -99,6 +99,15 @@ module.exports = {
     // general expressions
     'expression': chainedBinaryOperators,
     'boolTerm': chainedBinaryOperators,
+    'notBoolGroup': function(args) {
+      if (args[0].length > 0) {
+        return {
+          'type': 'operator',
+          'name': args[0][0],
+          'arguments': [args[1]]
+        };
+      } else return args[1];
+    },
     'boolRelation': function(args) {
       if (args[1].length === 0) {
         return args[0];
@@ -121,17 +130,20 @@ module.exports = {
     // basic helpers
     'number': [
       function(args) {
-        var digits = [args[0]].concat(args[1]);
+        var digits = [args[1]].concat(args[2]);
         var sum = 0;
         for (var i = 0; i < digits.length; i++) {
           var place = digits.length - i - 1;
           sum += digits[i] * Math.pow(10, place);
         }
-        return sum;
+
+        if (args[0].length > 0) return -sum;
+        else return sum;
       }
     ],
   
     // fundamental building blocks (terminals)
+    'not': function(not) {return 'not';},
     'space': function(space) {return ' ';},
     'zero': function(number) {return parseInt(number);},
     'nonzeroDigit': function(number) {return parseInt(number);},
