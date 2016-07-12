@@ -4,7 +4,7 @@
 | @author Anthony  |
 | @version 0.2     |
 | @date 2016/07/07 |
-| @edit 2016/07/08 |
+| @edit 2016/07/12 |
 \******************/
 
 // helper functions
@@ -57,17 +57,27 @@ module.exports = {
         'body': args[4]
       };
     },
-    'call': function(args) {
-      if (args[2].length === 0) {
-        return args[0]; // treat it as an identifier
-      } else {
+    'call': [
+      function(args) {
+        if (args[2].length === 0) {
+          return args[0]; // treat it as an identifier
+        } else {
+          return {
+            'type': 'call',
+            'name': args[0],
+            'arguments': args[2],
+          };
+        }
+      },
+
+      function(args) {
         return {
-          'type': 'call',
+          'type': 'builtIn',
           'name': args[0],
           'arguments': args[2],
         };
       }
-    },
+    ],
     'parameterList': secondMap,
     'argumentList': secondMap,
     'ifElse': function(args) {

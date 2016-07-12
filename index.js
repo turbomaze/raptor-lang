@@ -4,7 +4,7 @@
 | @author Anthony  |
 | @version 0.2     |
 | @date 2016/07/07 |
-| @edit 2016/07/10 |
+| @edit 2016/07/12 |
 \******************/
 
 // dependencies
@@ -16,33 +16,27 @@ var langStructure = require('./grammar/language-structure.js').structure;
 
 // working variables
 var parser = new Parser(langGrammar, langStructure);
-var interpreter = new Interpreter(langGrammar, langStructure);
+var interpreter = new Interpreter(langGrammar, langStructure, {
+  'log': function() {
+    console.log.apply(console, arguments);
+    return undefined;
+  },
 
-var goal = 'program';
+  'random': function(n) {
+    return Math.floor(n * Math.random());
+  }
+});
+
 var input = `
-
-fib => n {
-  n == 0 {
-    return 0
-  }
-
-  n == 1 {
-    return 1
-  }
-
-  return (fib -> n - 1) + (fib -> n - 2)
+logRandom => x {
+  log -> random -> x
 }
 
-double => x {
-  return x * 2
-}
-
-return fib -> double -> 10
+logRandom -> 1000
 `;
 
-
 // log the results
-var ast = parser.parse(goal, input.split(''));
+var ast = parser.parse('program', input.split(''));
 console.log("Source:");
 console.log(input.trim());
 
