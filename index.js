@@ -2,7 +2,7 @@
 |   Experimental   |
 | Functional Lang  |
 | @author Anthony  |
-| @version 0.1     |
+| @version 0.2     |
 | @date 2016/07/07 |
 | @edit 2016/07/10 |
 \******************/
