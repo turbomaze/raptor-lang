@@ -81,9 +81,7 @@ module.exports = {
       };
     },
     'block': function(args) {
-      return {
-        'type': 'block', 'statements': args[2]
-      };
+      return args[2];
     },
     'return': function(args) {
       return {

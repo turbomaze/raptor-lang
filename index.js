@@ -29,10 +29,13 @@ double => y {
   return 2 * y
 }
 
-a = 10
-b = triple -> a
-a = 9 * b + b
-return a
+a = 7
+b = a
+a >= 10 {
+  b = double -> 51
+}
+b = a * 131
+return b
 `;
 
 
