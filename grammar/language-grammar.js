@@ -2,7 +2,7 @@
 |     Language     |
 |     Grammar      |
 | @author Anthony  |
-| @version 0.1     |
+| @version 0.2     |
 | @date 2016/07/07 |
 | @edit 2016/07/08 |
 \******************/
@@ -14,8 +14,7 @@ var KEYWORDS = {
   andWord: 'and',
   orWord: 'or',
   trueWord: 'true',
-  falseWord: 'false',
-  declareWord: 'let'
+  falseWord: 'false'
 };
 
 // helper functions
@@ -66,164 +65,185 @@ function getStringFunc(str) {
 
 // grammar rules
 module.exports = {
-  // higher level language concepts
-  'program': '[ extendedSpace ], statements, [ extendedSpace ]',
-  'statements': 'statement, { newlineStatement }',
-  'newlineStatement': '\
-    spaceNewlineSpace, [ extendedSpace ], statement \
-  ',
-  'statement': 'declaration | return | ifElse | if | function | call',
-  'function': '\
-    identifier, [ space ], parameterList, [ extendedSpace ], block \
-  ',
-  'call': '\
-    identifier, [ space ], argumentList \
-  ',
-  'parameterList': '{ fatArrowIndentifier }',
-  'argumentList': '{ arrowExpression }',
-  'fatArrowIndentifier': 'fatArrow, [ space ], identifier, [ space ]',
-  'arrowExpression': 'arrow, [ space ], expression, [ space ]',
-  'ifElse': '\
-    expression, [ space ], block, [ extendedSpace ], \
-    elseWord, [ space ], block \
-  ',
-  'if': 'expression, [ space ], block',
-  'block': '\
-    leftBrace, [ extendedSpace ], statements, \
-    [ extendedSpace ], rightBrace \
-  ',
-  'return': 'returnWord, [ space ], expression',
-  'declaration': '\
-    declare, [ space ], identifier, [ space ], \
-    eq, [ space ], expression \
-  ',
+  keywords: KEYWORDS,
 
-  // general expressions (boolean and numeric)
-  'expression': 'boolTerm, { orBoolTerm }',
-  'orBoolTerm': 'space, or, space, boolTerm',
-  'boolTerm': 'boolGroup, { andBoolGroup }',
-  'andBoolGroup': 'space, and, space, boolGroup',
-  'boolGroup': '\
-    boolRelation | identifier | true | false \
-  ',
-  'boolRelation': '\
-    numExpression, [ boolOpNumExpression ] \
-  ',
-  'boolOpNumExpression': '\
-    [ space ], binBoolOp, [ space ], numExpression \
-  ',
-  'binBoolOp': 'lt | gt | eqeq | notEq',
-  'numExpression': 'term, { plusTerm }',
-  'plusTerm': '[ space ], plus, [ space ], term',
-  'term': 'group, { timesGroup }',
-  'timesGroup': '[ space ], times, [ space ], group',
-  'group': '\
-    number | identifier | \
-    left, [ space ], expression, [ space ], right \
-  ',
-  
-  // keywords
-  'returnWord': getStringFunc(KEYWORDS.returnWord),
-  'elseWord': getStringFunc(KEYWORDS.elseWord),
-  'and': getStringFunc(KEYWORDS.andWord),
-  'or': getStringFunc(KEYWORDS.orWord),
-  'true': getStringFunc(KEYWORDS.trueWord),
-  'false': getStringFunc(KEYWORDS.falseWord),
-  'declare': getStringFunc(KEYWORDS.declareWord),
-  // moves: >>>, vvv, <<<, ^^^
-  // rotates: @, counter clockwise, @@@, clockwise
-  // ??? message, logs message to console
+  grammar: {
+    // higher level language concepts
+    'program': '[ extendedSpace ], statements, [ extendedSpace ]',
+    'statements': 'statement, { newlineStatement }',
+    'newlineStatement': '\
+      spaceNewlineSpace, [ extendedSpace ], statement \
+    ',
+    'statement': 'assignment | return | ifElse | if | function | call',
+    'function': '\
+      identifier, [ space ], parameterList, [ extendedSpace ], block \
+    ',
+    'call': '\
+      identifier, [ space ], argumentList \
+    ',
+    'parameterList': '{ fatArrowIndentifier }',
+    'argumentList': '{ arrowExpression }',
+    'fatArrowIndentifier': 'fatArrow, [ space ], identifier, [ space ]',
+    'arrowExpression': 'arrow, [ space ], expression, [ space ]',
+    'ifElse': '\
+      expression, [ space ], block, [ extendedSpace ], \
+      elseWord, [ space ], block \
+    ',
+    'if': 'expression, [ space ], block',
+    'block': '\
+      leftBrace, [ extendedSpace ], statements, \
+      [ extendedSpace ], rightBrace \
+    ',
+    'return': 'returnWord, [ space ], expression',
+    'assignment': 'identifier, [ space ], eq, [ space ], expression',
 
-  // basic helpers
-  'identifier': function(tokens, ret) {
-    if (tokens.length >= 1) {
-      if (isLetter(tokens[0])) {
-        var identifier = tokens[0];
-        for (var i = 1; i < tokens.length; i++) {
-          if (isLetter(tokens[i]) || isDigit(tokens[i])) {
-            identifier += tokens[i];
-          } else break;
+    // general expressions (boolean and numeric)
+    'expression': 'boolTerm, { orBoolTerm }',
+    'orBoolTerm': 'space, or, space, boolTerm',
+    'boolTerm': 'notBoolGroup, { andNotBoolGroup }',
+    'andNotBoolGroup': 'space, and, space, notBoolGroup',
+    'notBoolGroup': '[ not ], boolGroup',
+    'boolGroup': '\
+      boolRelation | call | identifier | true | false \
+    ',
+    'boolRelation': '\
+      numExpression, [ boolOpNumExpression ] \
+    ',
+    'boolOpNumExpression': '\
+      [ space ], binBoolOp, [ space ], numExpression \
+    ',
+    'binBoolOp': 'lteq | gteq | lt | gt | eqeq | notEq',
+    'numExpression': 'term, { weakNumOpTerm }',
+    'weakNumOpTerm': '[ space ], weakNumOp, [ space ], term',
+    'term': 'group, { strongNumOpGroup }',
+    'strongNumOpGroup': '[ space ], strongNumOp, [ space ], group',
+    'group': '\
+      number | call | identifier | \
+      left, [ space ], expression, [ space ], right \
+    ',
+    
+    // keywords
+    'returnWord': getStringFunc(KEYWORDS.returnWord),
+    'elseWord': getStringFunc(KEYWORDS.elseWord),
+    'and': getStringFunc(KEYWORDS.andWord),
+    'or': getStringFunc(KEYWORDS.orWord),
+    'true': getStringFunc(KEYWORDS.trueWord),
+    'false': getStringFunc(KEYWORDS.falseWord),
+    // moves: >>>, vvv, <<<, ^^^
+    // rotates: @, counter clockwise, @@@, clockwise
+    // ??? message, logs message to console
+
+    // basic helpers
+    'identifier': function(tokens, ret) {
+      if (tokens.length >= 1) {
+        if (isLetter(tokens[0])) {
+          var identifier = tokens[0];
+          for (var i = 1; i < tokens.length; i++) {
+            if (isLetter(tokens[i]) || isDigit(tokens[i])) {
+              identifier += tokens[i];
+            } else break;
+          }
+
+          if (isNotKeyword(identifier)) {
+            ret.newTokens = tokens.slice(identifier.length);
+            ret.structure = identifier;
+            return true;
+          } else return false;
         }
-
-        if (isNotKeyword(identifier)) {
-          ret.newTokens = tokens.slice(identifier.length);
-          ret.structure = identifier;
-          return true;
-        } else return false;
       }
-    }
-    return false;
-  },
-  'number': 'nonzeroDigit, { digit }',
-  'extendedSpace': 'spaceNewlineSpace+ | space',
-  'spaceNewlineSpace': '[ space ], newline, [ space ]',
-  'space': 'blankChar, { blankChar }',
-  'alphanum': function(tokens, ret) {
-    if (tokens.length < 1) return false;
-
-    var character = tokens[0];
-    if (isLetter(character) || isNumber(character)) {
-      ret.newTokens = tokens.slice(1);
-      ret.structure = tokens[0];
-      return true;
-    } else {
       return false;
+    },
+    'number': '[ negative ], nonzeroDigit, { digit } | zero',
+    'extendedSpace': 'spaceNewlineSpace+ | space',
+    'spaceNewlineSpace': '[ space ], newline, [ space ]',
+    'space': 'blankChar, { blankChar }',
+    'alphanum': function(tokens, ret) {
+      if (tokens.length < 1) return false;
+
+      var character = tokens[0];
+      if (isLetter(character) || isNumber(character)) {
+        ret.newTokens = tokens.slice(1);
+        ret.structure = tokens[0];
+        return true;
+      } else {
+        return false;
+      }
+    },
+
+    // fundamental building blocks (terminals)
+    'fatArrow': getStringFunc('=>'),
+    'arrow': getStringFunc('->'),
+
+    'eqeq': getStringFunc('=='),
+    'notEq': getStringFunc('!='),
+    'not': getStringFunc('!'),
+    'lt': getCharFunc('<'),
+    'gt': getCharFunc('>'),
+    'lteq': getStringFunc('<='),
+    'gteq': getStringFunc('>='),
+
+    'weakNumOp': 'plus | minus',
+    'strongNumOp': 'times | divide',
+    'plus': getCharFunc('+'),
+    'minus': getCharFunc('-'),
+    'times': getCharFunc('*'),
+    'divide': getCharFunc('/'),
+    'negative': getCharFunc('-'),
+
+    'left': getCharFunc('('),
+    'right': getCharFunc(')'),
+    'leftBrace': getCharFunc('{'),
+    'rightBrace': getCharFunc('}'),
+    'semicolon': getCharFunc(';'),
+    'blankChar': function(tokens, ret) {
+      var isBlank = tokens.length >= 1 && tokens[0].match(
+        /^[ \t]/
+      ) !== null;
+      if (isBlank) {
+        ret.newTokens = tokens.slice(1);
+        ret.structure = tokens[0];
+      }
+      return isBlank;
+    },
+    'newline': getCharFunc('\n'), // TODO: pay attn to \r for newlines
+    'eq': getCharFunc('='),
+    'letter': function(tokens, ret) {
+      if (tokens.length < 1) return false;
+
+      var letter = tokens[0];
+      if (isLetter(letter)) {
+        ret.newTokens = tokens.slice(1);
+        ret.structure = tokens[0];
+        return true;
+      } else return false;
+    },
+    'zero': function(tokens, ret) {
+      if (tokens.length < 1) return false;
+
+      if (isDigit(tokens[0]) && tokens[0] === '0') {
+        ret.newTokens = tokens.slice(1);
+        ret.structure = tokens[0];
+        return true;
+      } else return false;
+    },
+    'nonzeroDigit': function(tokens, ret) {
+      if (tokens.length < 1) return false;
+
+      if (isDigit(tokens[0]) && tokens[0] !== '0') {
+        ret.newTokens = tokens.slice(1);
+        ret.structure = tokens[0];
+        return true;
+      } else return false;
+    },
+    'digit': function(tokens, ret) {
+      if (tokens.length < 1) return false;
+
+      if (isDigit(tokens[0])) {
+        ret.newTokens = tokens.slice(1);
+        ret.structure = tokens[0];
+        return true;
+      } else return false;
     }
-  },
-
-  // fundamental building blocks (terminals)
-  'fatArrow': getStringFunc('=>'),
-  'arrow': getStringFunc('->'),
-  'eqeq': getStringFunc('=='),
-  'notEq': getStringFunc('!='),
-  'lt': getCharFunc('<'),
-  'gt': getCharFunc('>'),
-  'plus': getCharFunc('+'),
-  'times': getCharFunc('*'),
-  'left': getCharFunc('('),
-  'right': getCharFunc(')'),
-  'leftBrace': getCharFunc('{'),
-  'rightBrace': getCharFunc('}'),
-  'semicolon': getCharFunc(';'),
-  'blankChar': function(tokens, ret) {
-    var isBlank = tokens.length >= 1 && tokens[0].match(
-      /^[ \t]/
-    ) !== null;
-    if (isBlank) {
-      ret.newTokens = tokens.slice(1);
-      ret.structure = tokens[0];
-    }
-    return isBlank;
-  },
-  'newline': getCharFunc('\n'), // TODO: pay attn to \r for newlines
-  'eq': getCharFunc('='),
-  'letter': function(tokens, ret) {
-    if (tokens.length < 1) return false;
-
-    var letter = tokens[0];
-    if (isLetter(letter)) {
-      ret.newTokens = tokens.slice(1);
-      ret.structure = tokens[0];
-      return true;
-    } else return false;
-  },
-  'nonzeroDigit': function(tokens, ret) {
-    if (tokens.length < 1) return false;
-
-    if (isDigit(tokens[0]) && tokens[0] !== '0') {
-      ret.newTokens = tokens.slice(1);
-      ret.structure = tokens[0];
-      return true;
-    } else return false;
-  },
-  'digit': function(tokens, ret) {
-    if (tokens.length < 1) return false;
-
-    if (isDigit(tokens[0])) {
-      ret.newTokens = tokens.slice(1);
-      ret.structure = tokens[0];
-      return true;
-    } else return false;
   }
 };
 
