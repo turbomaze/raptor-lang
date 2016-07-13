@@ -27,12 +27,15 @@ var interpreter = new Interpreter(langGrammar, langStructure, {
   }
 });
 
+var limits = {code: 1000, compute: 10000};
 var input = `
-logRandom => x {
-  log -> random -> x
+fib => n {
+  n == 0 { return 0 }
+  n == 1 { return 1 }
+  return (fib -> n - 1) + (fib -> n - 2)
 }
 
-logRandom -> 1000
+log -> fib -> 16
 `;
 
 // log the results
@@ -44,4 +47,9 @@ console.log(input.trim());
 // console.log(util.inspect(ast, false, null));
 
 console.log("\nInterpreting...");
-console.log(interpreter.interpret(input));
+try {
+  console.log(interpreter.interpret(input, limits));
+} catch (e) {
+  console.log('ERROR');
+  console.log(JSON.stringify(e, true, 4));
+}
