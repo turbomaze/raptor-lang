@@ -35,7 +35,13 @@ fib => n {
   return (fib -> n - 1) + (fib -> n - 2)
 }
 
-log -> fib -> 16
+evalPolynomial => a => b => c => x {
+  sq => w { return w * w }
+
+  return a * (sq -> x) + b * x + c
+}
+
+log -> fib -> evalPolynomial -> 1 -> 1 -> 0 -> 3
 `;
 
 // log the results
