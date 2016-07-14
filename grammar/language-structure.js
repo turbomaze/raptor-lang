@@ -54,6 +54,7 @@ module.exports = {
         'type': 'function',
         'name': args[0],
         'parameters': args[2],
+        'partials': {},
         'body': args[4]
       };
     },

@@ -94,7 +94,7 @@ module.exports = {
     'newlineStatement': '\
       spaceNewlineSpace, [ extendedSpace ], statement \
     ',
-    'statement': 'assignment | return | ifElse | if | function | call',
+    'statement': 'assignment | return | function | ifElse | if | call',
     'function': '\
       identifier, [ space ], parameterList, [ extendedSpace ], block \
     ',
@@ -115,7 +115,7 @@ module.exports = {
       leftBrace, [ extendedSpace ], statements, \
       [ extendedSpace ], rightBrace \
     ',
-    'return': 'returnWord, [ space ], expression',
+    'return': 'returnWord, [ space ], expression | ',
     'assignment': 'identifier, [ space ], eq, [ space ], expression',
 
     // general expressions (boolean and numeric)

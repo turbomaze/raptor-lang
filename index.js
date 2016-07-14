@@ -27,21 +27,18 @@ var interpreter = new Interpreter(langGrammar, langStructure, {
   }
 });
 
-var limits = {code: 1000, compute: 10000};
+var limits = {code: 100, compute: 10000};
 var input = `
-fib => n {
-  n == 0 { return 0 }
-  n == 1 { return 1 }
-  return (fib -> n - 1) + (fib -> n - 2)
+add => a => b => c {
+  return a + b + c
 }
 
-evalPolynomial => a => b => c => x {
-  sq => w { return w * w }
-
-  return a * (sq -> x) + b * x + c
-}
-
-log -> fib -> evalPolynomial -> 1 -> 1 -> 0 -> 3
+log -> add -> 4 -> 4 -> 2
+add5 = add -> 5
+add5and6 = add -> 5 -> 6
+same = add5and6
+log -> add5 -> 1 -> 19
+log -> same -> 7
 `;
 
 // log the results
