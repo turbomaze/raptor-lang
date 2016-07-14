@@ -29,16 +29,11 @@ var interpreter = new Interpreter(langGrammar, langStructure, {
 
 var limits = {code: 100, compute: 10000};
 var input = `
-add => a => b => c {
-  return a + b + c
+logMe {
+  log -> 100
 }
 
-log -> add -> 4 -> 4 -> 2
-add5 = add -> 5
-add5and6 = add -> 5 -> 6
-same = add5and6
-log -> add5 -> 1 -> 19
-log -> same -> 7
+logMe
 `;
 
 // log the results
