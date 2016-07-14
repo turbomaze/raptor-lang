@@ -115,7 +115,7 @@ module.exports = {
       leftBrace, [ extendedSpace ], statements, \
       [ extendedSpace ], rightBrace \
     ',
-    'return': 'returnWord, [ space ], expression | ',
+    'return': 'returnWord, [ space ], expression',
     'assignment': 'identifier, [ space ], eq, [ space ], expression',
 
     // general expressions (boolean and numeric)
