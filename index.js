@@ -29,11 +29,18 @@ var interpreter = new Interpreter(langGrammar, langStructure, {
 
 var limits = {code: 100, compute: 10000};
 var input = `
-logMe {
+loop => n => f {
+  n > 0 {
+  	f
+    loop -> (n - 1) -> f
+  }
+}
+
+moveUp {
   log -> 100
 }
 
-logMe
+loop -> 2 -> moveUp
 `;
 
 // log the results
