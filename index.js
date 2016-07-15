@@ -28,10 +28,12 @@ var interpreter = new Interpreter(langGrammar, langStructure, {
 });
 
 var limits = {code: 100, compute: 10000};
-var input = `foobar => x => y {
-  return .a * 2
+var input = `
+foobar => x => y {
+  return a * 2
 }
-log -> 16
+b = 124
+log -> ((4296 % b) % 27)
 `;
 
 // log the results

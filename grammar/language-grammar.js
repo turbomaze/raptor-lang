@@ -202,9 +202,10 @@ module.exports = {
     'gteq': getStringFunc('>='),
 
     'weakNumOp': 'plus | minus',
-    'strongNumOp': 'times | divide',
+    'strongNumOp': 'mod | times | divide',
     'plus': getCharFunc('+'),
     'minus': getCharFunc('-'),
+    'mod': getCharFunc('%'),
     'times': getCharFunc('*'),
     'divide': getCharFunc('/'),
     'negative': getCharFunc('-'),
