@@ -28,25 +28,20 @@ var interpreter = new Interpreter(langGrammar, langStructure, {
 });
 
 var limits = {code: 100, compute: 10000};
-var input = `
-loop => n => f {
-  n > 0 {
-  	f
-    loop -> (n - 1) -> f
-  }
+var input = `foobar => x => y {
+  return .a * 2
 }
-
-moveUp {
-  log -> 100
-}
-
-loop -> 2 -> moveUp
+log -> 16
 `;
 
 // log the results
-var ast = parser.parse('program', input.split(''));
 console.log("Source:");
 console.log(input.trim());
+try {
+  var ast = parser.parse('program', input.split(''));
+} catch (e) {
+  // chill
+}
 
 // console.log("\nAST:");
 // console.log(util.inspect(ast, false, null));
@@ -55,6 +50,5 @@ console.log("\nInterpreting...");
 try {
   console.log(interpreter.interpret(input, limits));
 } catch (e) {
-  console.log('ERROR');
   console.log(JSON.stringify(e, true, 4));
 }
