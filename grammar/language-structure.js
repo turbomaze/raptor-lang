@@ -1,5 +1,5 @@
 /******************\
-|     Language     |
+|    Raptor Lang   |
 |     Structure    |
 | @author Anthony  |
 | @version 0.2     |

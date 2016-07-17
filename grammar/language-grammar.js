@@ -1,5 +1,5 @@
 /******************\
-|     Language     |
+|   Raptor Lang    |
 |     Grammar      |
 | @author Anthony  |
 | @version 0.2     |
