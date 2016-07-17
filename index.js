@@ -1,10 +1,9 @@
 /******************\
-|   Experimental   |
-| Functional Lang  |
+|   Raptor Lang    |
 | @author Anthony  |
 | @version 0.2     |
 | @date 2016/07/07 |
-| @edit 2016/07/10 |
+| @edit 2016/07/12 |
 \******************/
 
 // dependencies
@@ -16,38 +15,81 @@ var langStructure = require('./grammar/language-structure.js').structure;
 
 // working variables
 var parser = new Parser(langGrammar, langStructure);
-var interpreter = new Interpreter(langGrammar, langStructure);
+var interpreter = new Interpreter(langGrammar, langStructure, {
+  'log': function() {
+    console.log.apply(console, arguments);
+    return undefined;
+  },
 
-var goal = 'program';
+  'random': function(n) {
+    return Math.floor(n * Math.random());
+  }
+});
+
+var limits = {code: 100, compute: 10000};
 var input = `
-
-fib => n {
-  n == 0 {
-    return 0
-  }
-
-  n == 1 {
-    return 1
-  }
-
-  return (fib -> n - 1) + (fib -> n - 2)
+divides => a => b {
+  return b % a == 0
 }
 
-double => x {
-  return x * 2
+isPrime => n {
+  return isPrimeh -> (n-1) -> n
 }
 
-return fib -> double -> 10
+isPrimeh => n => num {
+  n > 1 {
+    divides -> (n) -> num {
+      return false
+    } : {
+      return isPrimeh -> (n-1) -> num
+    }
+  } : {
+    return true
+  }
+}
+
+loop => n => f {
+  n > 0 {
+    f
+    loop -> (n-1) -> f
+  }
+}
+
+loopPrime => a => which {
+  a < 8 {
+    b = isPrime -> a
+    b or b {
+      which or which {
+        loop -> (a) -> moveRight
+      } : {
+        loop -> (a) -> dontMove
+      }
+      loopPrime -> (a+1) -> !which
+    } : {
+      loopPrime -> (a+1) -> which
+    }
+  }
+}
+
+moveRight
+loopPrime -> 1 -> false
 `;
 
-
 // log the results
-var ast = parser.parse(goal, input.split(''));
 console.log("Source:");
 console.log(input.trim());
+try {
+  var ast = parser.parse('program', input.split(''));
+} catch (e) {
+  // chill
+}
 
 // console.log("\nAST:");
 // console.log(util.inspect(ast, false, null));
 
 console.log("\nInterpreting...");
-console.log(interpreter.interpret(input));
+try {
+  console.log(interpreter.interpret(input, limits));
+} catch (e) {
+  console.log(JSON.stringify(e, true, 4));
+}

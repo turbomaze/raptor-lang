@@ -1,10 +1,10 @@
 /******************\
-|     Language     |
+|   Raptor Lang    |
 |     Grammar      |
 | @author Anthony  |
 | @version 0.2     |
 | @date 2016/07/07 |
-| @edit 2016/07/08 |
+| @edit 2016/07/12 |
 \******************/
 
 // keywords
@@ -15,6 +15,26 @@ var KEYWORDS = {
   orWord: 'or',
   trueWord: 'true',
   falseWord: 'false'
+};
+
+// built in functions
+var BUILT_INS = ['log', 'random'];
+for (var ai = 0; ai < BUILT_INS.length; ai++) {
+  KEYWORDS[BUILT_INS[ai]] = BUILT_INS[ai];
+}
+var GET_BUILT_IN = function(tokens, ret) {
+  for (var ai = 0; ai < BUILT_INS.length; ai++) {
+    var str = BUILT_INS[ai];
+    if (tokens.length >= str.length) {
+      var attempt = tokens.slice(0, str.length).join('');
+      if (attempt === str) {
+        ret.newTokens = tokens.slice(str.length);
+        ret.structure = str;
+        return true;
+      }
+    }
+  }
+  return false;
 };
 
 // helper functions
@@ -74,12 +94,13 @@ module.exports = {
     'newlineStatement': '\
       spaceNewlineSpace, [ extendedSpace ], statement \
     ',
-    'statement': 'assignment | return | ifElse | if | function | call',
+    'statement': 'assignment | return | function | ifElse | if | call',
     'function': '\
       identifier, [ space ], parameterList, [ extendedSpace ], block \
     ',
     'call': '\
-      identifier, [ space ], argumentList \
+      identifier, [ space ], argumentList | \
+      builtInFunctions, [ space ], argumentList \
     ',
     'parameterList': '{ fatArrowIndentifier }',
     'argumentList': '{ arrowExpression }',
@@ -123,15 +144,13 @@ module.exports = {
     ',
     
     // keywords
+    'builtInFunctions': GET_BUILT_IN,
     'returnWord': getStringFunc(KEYWORDS.returnWord),
     'elseWord': getStringFunc(KEYWORDS.elseWord),
     'and': getStringFunc(KEYWORDS.andWord),
     'or': getStringFunc(KEYWORDS.orWord),
     'true': getStringFunc(KEYWORDS.trueWord),
     'false': getStringFunc(KEYWORDS.falseWord),
-    // moves: >>>, vvv, <<<, ^^^
-    // rotates: @, counter clockwise, @@@, clockwise
-    // ??? message, logs message to console
 
     // basic helpers
     'identifier': function(tokens, ret) {
@@ -183,9 +202,10 @@ module.exports = {
     'gteq': getStringFunc('>='),
 
     'weakNumOp': 'plus | minus',
-    'strongNumOp': 'times | divide',
+    'strongNumOp': 'mod | times | divide',
     'plus': getCharFunc('+'),
     'minus': getCharFunc('-'),
+    'mod': getCharFunc('%'),
     'times': getCharFunc('*'),
     'divide': getCharFunc('/'),
     'negative': getCharFunc('-'),
