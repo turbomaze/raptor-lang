@@ -2,15 +2,13 @@
 |   Raptor Lang    |
 |   Interpreter    |
 | @author Anthony  |
-| @version 1.1     |
+| @version 0.2     |
 | @date 2016/07/10 |
-| @edit 2016/07/12 |
+| @edit 2016/08/21 |
 \******************/
 
 var util = require('util');
 var Parser = require('./parser.js').Parser;
-var langGrammar = require('../grammar/language-grammar.js');
-var langStructure = require('../grammar/language-structure.js');
 
 // exports
 var exports = module.exports = {};

@@ -3,42 +3,39 @@
 | @author Anthony  |
 | @version 0.2     |
 | @date 2016/07/07 |
-| @edit 2016/07/12 |
+| @edit 2016/08/21 |
 \******************/
 
 // dependencies
-var util = require('util');
-var Parser = require('./lib/parser.js').Parser;
-var Interpreter = require('./lib/interpreter.js').Interpreter;
-var langGrammar = require('./grammar/language-grammar.js').grammar;
-var langStructure = require('./grammar/language-structure.js').structure;
+var raptor = require('./raptor.js')('std');
 
 // working variables
-var parser = new Parser(langGrammar, langStructure);
-var interpreter = new Interpreter(langGrammar, langStructure, {
-  'log': function() {
-    console.log.apply(console, arguments);
-    return undefined;
-  },
-
-  'random': function(n) {
-    return Math.floor(n * Math.random());
-  }
-});
-
 var limits = {code: 100, compute: 10000};
-var input = `g {
-  log -> 35
-  return 111
+var input = `
+isPrime => n {
+  return isPrimeH -> (n) -> n - 1
 }
-foo {
-  log -> 22
+
+isPrimeH => n => a {
+  a == 1 {
+    return true
+  }
+
+  n % a == 0 {
+    return false
+  } : {
+    return isPrimeH -> (n) -> (a - 1)
+  }
 }
-foo
+
+log -> isPrime -> 2
+log -> isPrime -> 18
+log -> isPrime -> 119
+log -> isPrime -> 139
 `;
 
 try {
-  interpreter.interpret(input, limits);
+  raptor.interpret(input, limits);
 } catch (e) {
   console.log(JSON.stringify(e, true, 4));
 }

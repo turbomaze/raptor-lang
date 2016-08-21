@@ -1,0 +1,25 @@
+{
+  "name": "raptor-lang",
+  "version": "0.2.0",
+  "description": "Raptor is an experimental functional programming language implemented in JavaScript.",
+  "main": "raptor.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/turbomaze/raptor-lang.git"
+  },
+  "keywords": [
+    "programming languages",
+    "interpreters",
+    "functional",
+    "procedural"
+  ],
+  "author": "Anthony Liu",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/turbomaze/raptor-lang/issues"
+  },
+  "homepage": "https://github.com/turbomaze/raptor-lang#readme"
+}
