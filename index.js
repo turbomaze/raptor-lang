@@ -27,69 +27,18 @@ var interpreter = new Interpreter(langGrammar, langStructure, {
 });
 
 var limits = {code: 100, compute: 10000};
-var input = `
-divides => a => b {
-  return b % a == 0
+var input = `g {
+  log -> 35
+  return 111
 }
-
-isPrime => n {
-  return isPrimeh -> (n-1) -> n
+foo {
+  log -> 22
 }
-
-isPrimeh => n => num {
-  n > 1 {
-    divides -> (n) -> num {
-      return false
-    } : {
-      return isPrimeh -> (n-1) -> num
-    }
-  } : {
-    return true
-  }
-}
-
-loop => n => f {
-  n > 0 {
-    f
-    loop -> (n-1) -> f
-  }
-}
-
-loopPrime => a => which {
-  a < 8 {
-    b = isPrime -> a
-    b or b {
-      which or which {
-        loop -> (a) -> moveRight
-      } : {
-        loop -> (a) -> dontMove
-      }
-      loopPrime -> (a+1) -> !which
-    } : {
-      loopPrime -> (a+1) -> which
-    }
-  }
-}
-
-moveRight
-loopPrime -> 1 -> false
+foo
 `;
 
-// log the results
-console.log("Source:");
-console.log(input.trim());
 try {
-  var ast = parser.parse('program', input.split(''));
-} catch (e) {
-  // chill
-}
-
-// console.log("\nAST:");
-// console.log(util.inspect(ast, false, null));
-
-console.log("\nInterpreting...");
-try {
-  console.log(interpreter.interpret(input, limits));
+  interpreter.interpret(input, limits);
 } catch (e) {
   console.log(JSON.stringify(e, true, 4));
 }
