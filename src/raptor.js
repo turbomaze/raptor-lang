@@ -1,18 +1,14 @@
-/******************\
-|   Raptor Lang    |
-| @author Anthony  |
-| @version 0.2     |
-| @date 2016/08/21 |
-| @edit 2016/08/21 |
-\******************/
+// Raptor-lang
+// @author Anthony Liu
+// @date 2016/08/21
 
 // dependencies
+var Interpreter = require('./interpreter.js').Interpreter;
 var libraries = {
-  std: require('./src/libs/std.js')
+  std: require('./libraries/std.js')
 };
-var Interpreter = require('./src/interpreter.js').Interpreter;
-var grammar = require('./grammar/language-grammar.js').grammar;
-var structure = require('./grammar/language-structure.js').structure;
+var grammar = require('./language/grammar.js').grammar;
+var structure = require('./language/structure.js').structure;
 
 module.exports = function(library) {
   library = library || 'std';
@@ -21,7 +17,7 @@ module.exports = function(library) {
   builtIns = library;
   if (typeof library === 'string') {
     if (!(library in libraries)) {
-      throw 'RAPTOR ERROR: unknown library "' + library + '".';
+      throw 'RAPTOR ERR: unknown library "' + library + '".';
     } else {
       builtIns = libraries[library];
     }

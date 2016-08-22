@@ -2,9 +2,9 @@
   "name": "raptor-lang",
   "version": "0.2.0",
   "description": "Raptor is an experimental functional programming language implemented in JavaScript.",
-  "main": "raptor.js",
+  "main": "src/raptor.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha"
   },
   "repository": {
     "type": "git",
@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/turbomaze/raptor-lang/issues"
   },
-  "homepage": "https://github.com/turbomaze/raptor-lang#readme"
+  "homepage": "https://github.com/turbomaze/raptor-lang#readme",
+  "dependencies": {
+    "parlance": "^1.3.1"
+  }
 }

@@ -1,11 +1,6 @@
-/******************\
-|   Raptor Lang    |
-|     Grammar      |
-| @author Anthony  |
-| @version 0.2     |
-| @date 2016/07/07 |
-| @edit 2016/07/12 |
-\******************/
+// Raptor-lang grammar
+// @author Anthony Liu
+// @date 2016/07/12
 
 // keywords
 var KEYWORDS = {

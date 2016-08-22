@@ -1,10 +1,6 @@
-/******************\
-|   Raptor Lang    |
-| @author Anthony  |
-| @version 0.2     |
-| @date 2016/08/21 |
-| @edit 2016/08/21 |
-\******************/
+// Raptor-lang std library
+// @author Anthony Liu
+// @date 2016/08/21
 
 module.exports = {
   'log': function() {
