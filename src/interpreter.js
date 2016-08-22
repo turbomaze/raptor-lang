@@ -503,6 +503,7 @@ function getLineAndPositionFromTokens(tokens, offset) {
     return line + (token === '\n' ? 1 : 0);
   }, 1);
   var colNum = validPrefix.reverse().indexOf('\n');
+  colNum = colNum > 0 ? colNum : offset;
   return {line: lineNumber, col: colNum};
 }
 
