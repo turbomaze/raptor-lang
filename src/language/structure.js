@@ -1,11 +1,6 @@
-/******************\
-|    Raptor Lang   |
-|     Structure    |
-| @author Anthony  |
-| @version 0.2     |
-| @date 2016/07/07 |
-| @edit 2016/07/12 |
-\******************/
+// Raptor-lang structure
+// @author Anthony Liu
+// @date 2016/07/12
 
 // helper functions
 function binaryOperator(args) {

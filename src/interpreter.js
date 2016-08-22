@@ -1,16 +1,9 @@
-/******************\
-|   Raptor Lang    |
-|   Interpreter    |
-| @author Anthony  |
-| @version 1.1     |
-| @date 2016/07/10 |
-| @edit 2016/07/12 |
-\******************/
+// Raptor-lang interpreter
+// @author Anthony Liu
+// @date 2016/08/21
 
-var util = require('util');
-var Parser = require('./parser.js').Parser;
-var langGrammar = require('../grammar/language-grammar.js');
-var langStructure = require('../grammar/language-structure.js');
+// dependencies
+var parlance = require('parlance');
 
 // exports
 var exports = module.exports = {};
@@ -21,82 +14,29 @@ exports.ERR_COMPUTE = 102;
 // config
 var GOAL = 'program';
 
-// helpers
-function getSizeOfAST(ast) {
-  var count = 1;
-
-  var type = Object.prototype.toString.call(ast);
-  switch (type) {
-    // tokens with an additional type specification
-    case '[object Object]':
-      switch (ast.type) {
-        case 'function':
-          count += getSizeOfAST(ast.parameters);
-          count += getSizeOfAST(ast.body);
-          break;
-        case 'call':
-        case 'builtIn':
-          count += getSizeOfAST(ast.arguments);
-          break;
-        case 'ifElse':
-          count += getSizeOfAST(ast.predicate);
-          count += getSizeOfAST(ast.body);
-          count += getSizeOfAST(ast.else);
-          break;
-        case 'if':
-          count += getSizeOfAST(ast.predicate);
-          count += getSizeOfAST(ast.body);
-          break;
-        case 'return':
-        case 'assignment':
-          count += getSizeOfAST(ast.value);
-          break;
-        case 'operator': // incidental similarity with call's
-          count += getSizeOfAST(ast.arguments);
-          break;
-      }
-      break;
-
-    // sequence of ASTs
-    case '[object Array]':
-      ast.forEach(function(node) {
-        count += getSizeOfAST(node);
-      }); 
-      break;
-
-    // terminals
-    case '[object String]':
-    case '[object Number]':
-    case '[object Boolean]':
-      break;
-  }
-
-  return count;
-}
-
-function exitIfExcessiveCompute(stats, limits) {
-  if (stats['statement'] > limits.compute) {
-    throw {message: 'too much compute', code: exports.ERR_COMPUTE};
-  }
-}
-
-function logStats(type, stats, limits) {
-  stats[type] = (stats[type] || 0) + 1;
-  exitIfExcessiveCompute(stats, limits);
-}
-
-// interpreter object
 function Interpreter(grammar, structure, builtIns) {
-  this.parser = new Parser(grammar, structure);
+  this.parser = parlance(grammar, structure);
   this.builtIns = builtIns;
   this.limits = {code: Infinity, compute: Infinity};
 }
 
-Interpreter.prototype.interpret = function(input, limits) {
+Interpreter.prototype.interpret = function(input, limits, stats) {
   this.limits = limits || this.limits;
+  stats = stats || {};
 
   // get the AST
-  var ast = this.parser.parse(GOAL, input.split('')); // throws exceptions
+  var tokens = input.split('');
+  var ast = [];
+  try {
+    ast = this.parser.parse(GOAL, tokens); // throws exceptions
+  } catch (e) {
+    var errorOffset = tokens.length - e.data.tokens.length;
+    var info = getLineAndPositionFromTokens(tokens, errorOffset);
+    throw {
+      message: 'ERR: syntax error on line ' + info.line + ' column ' + info.col + '.',
+      data: info
+    };
+  }
 
   // get the size of the AST
   var codeSize = getSizeOfAST(ast);
@@ -105,13 +45,13 @@ Interpreter.prototype.interpret = function(input, limits) {
   }
 
   // run it
-  var stats = {astSize: codeSize};
+  stats.astSize = codeSize;
   var start = +new Date();
   try {
-    this.runBlock({}, ast, stats);
+    var result = this.runBlock({}, ast, stats);
     var end = +new Date();
-    stats['time'] = end - start; // in ms
-    return stats;
+    stats.time = end - start; // in ms
+    return result;
   } catch (e) {
     var end = +new Date();
     stats['time'] = end - start; // in ms
@@ -142,9 +82,12 @@ Interpreter.prototype.runFunction = function(variables, call, stats) {
   }
 
   // get the arguments
-  var args = call.arguments.map(function(argument) {
-    return self.evaluateExpression(variables, argument, stats);
-  });
+  var args = [];
+  if ('arguments' in call) {
+    args = call.arguments.map(function(argument) {
+      return self.evaluateExpression(variables, argument, stats);
+    });
+  }
 
   // if they haven't supplied enough arguments, partially apply it
   var numPartials = Object.keys(definition.partials).length;
@@ -202,9 +145,12 @@ Interpreter.prototype.runBuiltIn = function(variables, call, stats) {
   logStats('builtIn', stats, this.limits);
 
   // get the arguments
-  var args = call.arguments.map(function(argument) {
-    return self.evaluateExpression(variables, argument, stats);
-  });
+  var args = [];
+  if ('arguments' in call) {
+    args = call.arguments.map(function(argument) {
+      return self.evaluateExpression(variables, argument, stats);
+    });
+  }
 
   // get the definition
   switch (call.name) {
@@ -238,15 +184,23 @@ Interpreter.prototype.executeStatement = function(
   if (typeof statement === 'string') {
     // it's a naked identifier; treat it as a function call
     if (statement in variables && typeof variables[statement] === 'object') {
-      return this.runFunction(
-        variables,
-        {
-          'type': 'call',
-          'name': statement,
-          'arguments': []
-        },
-        stats
-      );
+      if (variables[statement].type === 'function') {
+        return this.runFunction(
+          variables,
+          {
+            'type': 'call',
+            'name': statement,
+            'arguments': []
+          },
+          stats
+        );
+      } else {
+        return this.runBuiltIn(
+          variables,
+          variables[statement],
+          stats
+        );
+      }
     } else if (statement in this.builtIn) {
       return this.runFunction(
         variables,
@@ -315,6 +269,12 @@ Interpreter.prototype.evaluateExpression = function(
   if (typeof expression === 'string') {
     if (expression in variables) {
       return variables[expression];
+    } else if (expression in this.builtIns) { 
+      return {
+        'type': 'builtIn',
+        'name': expression,
+        'arguments': []
+      };
     } else {
       throw 'ERR: identifier "' + expression + '" ' +
         'does not refer to an in-scope variable or function.';
@@ -328,10 +288,18 @@ Interpreter.prototype.evaluateExpression = function(
   } else {
     switch (expression.type) {
       case 'call':
-        return this.runFunction(variables, expression, stats);
+        if (expression.arguments.length === 0) {
+          return expression;
+        } else {
+          return this.runFunction(variables, expression, stats);
+        }
 
       case 'builtIn':
-        return this.runBuiltIn(variables, expression, stats);
+        if (expression.arguments.length === 0) {
+          return expression;
+        } else {
+          return this.runBuiltIn(variables, expression, stats);
+        }
 
       case 'operator':
         return this.evaluateOperator(
@@ -475,6 +443,79 @@ Interpreter.prototype.evaluateOperator = function(
       throw 'ERR: Unknown operator "' + name + '".';
   }
 };
+
+// helpers
+function getSizeOfAST(ast) {
+  var count = 1;
+
+  var type = Object.prototype.toString.call(ast);
+  switch (type) {
+    // tokens with an additional type specification
+    case '[object Object]':
+      switch (ast.type) {
+        case 'function':
+          count += getSizeOfAST(ast.parameters);
+          count += getSizeOfAST(ast.body);
+          break;
+        case 'call':
+        case 'builtIn':
+          count += getSizeOfAST(ast.arguments);
+          break;
+        case 'ifElse':
+          count += getSizeOfAST(ast.predicate);
+          count += getSizeOfAST(ast.body);
+          count += getSizeOfAST(ast.else);
+          break;
+        case 'if':
+          count += getSizeOfAST(ast.predicate);
+          count += getSizeOfAST(ast.body);
+          break;
+        case 'return':
+        case 'assignment':
+          count += getSizeOfAST(ast.value);
+          break;
+        case 'operator': // incidental similarity with call's
+          count += getSizeOfAST(ast.arguments);
+          break;
+      }
+      break;
+
+    // sequence of ASTs
+    case '[object Array]':
+      ast.forEach(function(node) {
+        count += getSizeOfAST(node);
+      }); 
+      break;
+
+    // terminals
+    case '[object String]':
+    case '[object Number]':
+    case '[object Boolean]':
+      break;
+  }
+
+  return count;
+}
+
+function getLineAndPositionFromTokens(tokens, offset) {
+  var validPrefix = tokens.slice(0, offset);
+  var lineNumber = validPrefix.reduce(function(line, token) {
+    return line + (token === '\n' ? 1 : 0);
+  }, 1);
+  var colNum = validPrefix.reverse().indexOf('\n');
+  return {line: lineNumber, col: colNum};
+}
+
+function exitIfExcessiveCompute(stats, limits) {
+  if (stats['statement'] > limits.compute) {
+    throw {message: 'too much compute', code: exports.ERR_COMPUTE};
+  }
+}
+
+function logStats(type, stats, limits) {
+  stats[type] = (stats[type] || 0) + 1;
+  exitIfExcessiveCompute(stats, limits);
+}
 
 exports.Interpreter = Interpreter;
 exports.getSizeOfAST = getSizeOfAST;
