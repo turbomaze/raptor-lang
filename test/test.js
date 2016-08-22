@@ -12,10 +12,38 @@ var limits = {code: 100, compute: 10000};
 describe('Raptor', function() {
   describe('#std', function() {
     describe('#interpret', function() {
-      it('should be able to return explicit values', function() {
+      it('should be able to return integers', function() {
         var input = 'return 101';
         var actual = raptor.interpret(input, limits);
         var expected = 101;
+        assert.deepEqual(actual, expected);
+      });
+
+      it('should be able to parse simple doubles', function() {
+        var input = 'return 3.14159';
+        var actual = raptor.interpret(input, limits);
+        var expected = 3.14159;
+        assert.deepEqual(actual, expected);
+      });
+
+      it('should be able to parse negative doubles', function() {
+        var input = 'return -1.6180339';
+        var actual = raptor.interpret(input, limits);
+        var expected = -1.6180339;
+        assert.deepEqual(actual, expected);
+      });
+
+      it('should be able to parse tiny doubles', function() {
+        var input = 'return 0.000123';
+        var actual = raptor.interpret(input, limits);
+        var expected = 0.000123;
+        assert.deepEqual(actual, expected);
+      });
+
+      it('should be able to parse redundant doubles', function() {
+        var input = 'return 420.000';
+        var actual = raptor.interpret(input, limits);
+        var expected = 420;
         assert.deepEqual(actual, expected);
       });
 

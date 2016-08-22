@@ -167,7 +167,11 @@ module.exports = {
       }
       return false;
     },
-    'number': '[ negative ], nonzeroDigit, { digit } | zero',
+    'number': 'decimal | integer',
+    'decimal': '[ negative ], wholeNumber, dot, fractionalPart',
+    'fractionalPart': '{ zero }, wholeNumber | zero+',
+    'integer': '[ negative ], wholeNumber',
+    'wholeNumber': 'nonzeroDigit, { digit } | zero',
     'extendedSpace': 'spaceNewlineSpace+ | space',
     'spaceNewlineSpace': '[ space ], newline, [ space ]',
     'space': 'blankChar, { blankChar }',
@@ -210,6 +214,7 @@ module.exports = {
     'leftBrace': getCharFunc('{'),
     'rightBrace': getCharFunc('}'),
     'semicolon': getCharFunc(';'),
+    'dot': getCharFunc('.'),
     'blankChar': function(tokens, ret) {
       var isBlank = tokens.length >= 1 && tokens[0].match(
         /^[ \t]/

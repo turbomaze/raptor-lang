@@ -134,17 +134,37 @@ module.exports = {
     'false': function(args) { return false; },
   
     // basic helpers
-    'number': [
+    'decimal': function(args) {
+      var left = args[1];
+      var right = args[3];
+      var sum = left + right;
+      if (args[0].length > 0) return -sum;
+      else return sum;
+    },
+    'fractionalPart': [
       function(args) {
-        var digits = [args[1]].concat(args[2]);
+        var numZeroes = args[0].length;
+        var places = Math.ceil(Math.log10(args[1]));
+        var denominator = args[1] === 0 ? 1 : Math.pow(
+          10, numZeroes + places
+        );
+        return args[1]/denominator;
+      },
+      function(args) {return 0;}
+    ],
+    'integer': function(args) {
+      if (args[0].length > 0) return -args[1];
+      else return args[1];
+    },
+    'wholeNumber': [
+      function(args) {
+        var digits = [args[0]].concat(args[1]);
         var sum = 0;
         for (var i = 0; i < digits.length; i++) {
           var place = digits.length - i - 1;
           sum += digits[i] * Math.pow(10, place);
         }
-
-        if (args[0].length > 0) return -sum;
-        else return sum;
+        return sum;
       }
     ],
   
