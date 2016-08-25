@@ -1,6 +1,6 @@
 // Raptor-lang grammar
 // @author Anthony Liu
-// @date 2016/07/12
+// @date 2016/08/23
 
 // keywords
 var KEYWORDS = {
@@ -94,7 +94,7 @@ module.exports = {
       identifier, [ space ], parameterList, [ extendedSpace ], block \
     ',
     'call': '\
-      identifier, [ space ], argumentList | \
+      labeledValue, [ space ], argumentList | \
       builtInFunctions, [ space ], argumentList \
     ',
     'parameterList': '{ fatArrowIndentifier }',
@@ -114,13 +114,13 @@ module.exports = {
     'assignment': 'identifier, [ space ], eq, [ space ], expression',
 
     // general expressions (boolean and numeric)
-    'expression': 'boolTerm, { orBoolTerm }',
+    'expression': 'boolTerm, { orBoolTerm } | list',
     'orBoolTerm': 'space, or, space, boolTerm',
     'boolTerm': 'notBoolGroup, { andNotBoolGroup }',
     'andNotBoolGroup': 'space, and, space, notBoolGroup',
     'notBoolGroup': '[ not ], boolGroup',
     'boolGroup': '\
-      boolRelation | call | identifier | true | false \
+      boolRelation | call | labeledValue | true | false \
     ',
     'boolRelation': '\
       numExpression, [ boolOpNumExpression ] \
@@ -134,9 +134,22 @@ module.exports = {
     'term': 'group, { strongNumOpGroup }',
     'strongNumOpGroup': '[ space ], strongNumOp, [ space ], group',
     'group': '\
-      number | call | identifier | \
+      number | call | labeledValue | \
       left, [ space ], expression, [ space ], right \
     ',
+    'labeledValue': 'listAccess | identifier',
+
+    // lists
+    'list': '\
+      leftBracket, [ extendedSpace ], [ values ], \
+      rightBracket \
+    ',
+    'values': 'value, { commaValue }',
+    'commaValue': '[ space ], comma, [ extendedSpace ], value',
+    'value': 'number | boolean | list | labeledValue',
+    'listAccess': 'identifier, underscore, expressionList',
+    'expressionList': 'expression, { commaExpression }',
+    'commaExpression': 'comma, expression',
     
     // keywords
     'builtInFunctions': GET_BUILT_IN,
@@ -172,6 +185,7 @@ module.exports = {
     'fractionalPart': '{ zero }, wholeNumber | zero+',
     'integer': '[ negative ], wholeNumber',
     'wholeNumber': 'nonzeroDigit, { digit } | zero',
+    'boolean': 'true | false',
     'extendedSpace': 'spaceNewlineSpace+ | space',
     'spaceNewlineSpace': '[ space ], newline, [ space ]',
     'space': 'blankChar, { blankChar }',
@@ -213,8 +227,14 @@ module.exports = {
     'right': getCharFunc(')'),
     'leftBrace': getCharFunc('{'),
     'rightBrace': getCharFunc('}'),
+    'leftBracket': getCharFunc('['),
+    'rightBracket': getCharFunc(']'),
     'semicolon': getCharFunc(';'),
     'dot': getCharFunc('.'),
+    'comma': getCharFunc(','),
+    'underscore': getCharFunc('_'),
+    'newline': getCharFunc('\n'), // TODO: pay attn to \r's too
+    'eq': getCharFunc('='),
     'blankChar': function(tokens, ret) {
       var isBlank = tokens.length >= 1 && tokens[0].match(
         /^[ \t]/
@@ -225,8 +245,6 @@ module.exports = {
       }
       return isBlank;
     },
-    'newline': getCharFunc('\n'), // TODO: pay attn to \r for newlines
-    'eq': getCharFunc('='),
     'letter': function(tokens, ret) {
       if (tokens.length < 1) return false;
 

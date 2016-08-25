@@ -1,6 +1,6 @@
 // Raptor-lang structure
 // @author Anthony Liu
-// @date 2016/07/12
+// @date 2016/08/23
 
 // helper functions
 function binaryOperator(args) {
@@ -103,7 +103,7 @@ module.exports = {
     },
   
     // general expressions
-    'expression': chainedBinaryOperators,
+    'expression': [chainedBinaryOperators],
     'boolTerm': chainedBinaryOperators,
     'notBoolGroup': function(args) {
       if (args[0].length > 0) {
@@ -128,6 +128,31 @@ module.exports = {
     'numExpression': chainedBinaryOperators,
     'term': chainedBinaryOperators,
     'group': [null, null, null, third],
+
+    // lists
+    'list': function(args) {
+      return (args[2].length > 0 ? args[2][0] : []);
+    },
+    'values': function(args) {
+      var struct = [args[0]];
+      var commaValues = args[1];
+      commaValues.forEach(function(commaValue) {
+        struct.push(commaValue[3]);
+      });
+      return struct;
+    },
+    'listAccess': function(args) {
+      var indices = [args[2][0]].concat(args[2][1].map(
+        function(arg) {
+          return arg[1];  
+        }
+      ));
+      return {
+        'type': 'access',
+        'name': args[0],
+        'indices': indices
+      };
+    },
   
     // keywords
     'true': function(args) { return true; },

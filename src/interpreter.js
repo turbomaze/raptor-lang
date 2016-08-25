@@ -1,6 +1,6 @@
 // Raptor-lang interpreter
 // @author Anthony Liu
-// @date 2016/08/21
+// @date 2016/08/23
 
 // dependencies
 var parlance = require('parlance');
@@ -285,8 +285,36 @@ Interpreter.prototype.evaluateExpression = function(
   } else if (typeof expression === 'boolean') {
     // it's a boolean 
     return expression;
+  } else if (Array.isArray(expression)) {
+    // it's a list
+    return expression;
   } else {
     switch (expression.type) {
+      case 'access':
+        var identifier = expression.name;
+        var value = this.evaluateExpression(
+          variables, identifier, stats
+        );
+        var self = this;
+        var indices = expression.indices.map(
+          function(indexExpression) {
+            return self.evaluateExpression(
+              variables, indexExpression, stats
+            );
+          }
+        );
+
+        while (indices.length > 0) {
+          var index = indices.shift();
+          if (Array.isArray(value)) {
+            value = value[index]; 
+          } else {
+            throw 'ERR: invalid array access.';
+          }
+        }
+
+        return value;
+
       case 'call':
         if (expression.arguments.length === 0) {
           return expression;
@@ -499,11 +527,12 @@ function getSizeOfAST(ast) {
 
 function getLineAndPositionFromTokens(tokens, offset) {
   var validPrefix = tokens.slice(0, offset);
+  console.log(JSON.stringify(validPrefix));
   var lineNumber = validPrefix.reduce(function(line, token) {
     return line + (token === '\n' ? 1 : 0);
   }, 1);
   var colNum = validPrefix.reverse().indexOf('\n');
-  colNum = colNum > 0 ? colNum : offset;
+  colNum = colNum >= 0 ? colNum : offset;
   return {line: lineNumber, col: colNum};
 }
 
