@@ -98,7 +98,9 @@ module.exports = {
       var identifier = args[0]; 
       var value = args[4]; 
       return {
-        'type': 'assignment', 'name': identifier, 'value': value
+        'type': 'assignment',
+        'labeledValue': identifier,
+        'value': value
       };
     },
   

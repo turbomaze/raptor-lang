@@ -251,9 +251,40 @@ Interpreter.prototype.executeStatement = function(
         return undefined;
 
       case 'assignment':
-        variables[statement.name] = this.evaluateExpression(
-          variables, statement.value, stats
-        ); 
+        if (typeof statement.labeledValue === 'string') {
+          // variable assignment
+          variables[statement.labeledValue] = this.evaluateExpression(
+            variables, statement.value, stats
+          ); 
+        } else {
+          // list assignment
+          var access = statement.labeledValue;
+          var list = this.evaluateExpression(
+            variables, access.name, stats
+          );
+          var self = this;
+          var indices = access.indices.map(
+            function(indexExpression) {
+              return self.evaluateExpression(
+                variables, indexExpression, stats
+              );
+            }
+          );
+
+          while (indices.length > 1) {
+            var index = indices.shift();
+            if (Array.isArray(list)) {
+              list = list[index]; 
+            } else {
+              throw 'ERR: invalid array access.';
+            }
+          }
+
+          list[indices[0]] = this.evaluateExpression(
+            variables, statement.value, stats
+          );
+        }
+
         return undefined;
     }
   }
@@ -313,7 +344,9 @@ Interpreter.prototype.evaluateExpression = function(
           }
         }
 
-        return value;
+        return this.evaluateExpression(
+          variables, value, stats
+        );
 
       case 'call':
         if (expression.arguments.length === 0) {
@@ -527,13 +560,16 @@ function getSizeOfAST(ast) {
 
 function getLineAndPositionFromTokens(tokens, offset) {
   var validPrefix = tokens.slice(0, offset);
-  console.log(JSON.stringify(validPrefix));
   var lineNumber = validPrefix.reduce(function(line, token) {
     return line + (token === '\n' ? 1 : 0);
   }, 1);
   var colNum = validPrefix.reverse().indexOf('\n');
   colNum = colNum >= 0 ? colNum : offset;
-  return {line: lineNumber, col: colNum};
+  return {
+    line: lineNumber,
+    col: colNum,
+    validPrefix: validPrefix
+  };
 }
 
 function exitIfExcessiveCompute(stats, limits) {

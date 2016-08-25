@@ -141,6 +141,43 @@ return a_(c*c - 99)
         assert.deepEqual(actual, expected);
       });
 
+      it('should support primitive list assignments', function() {
+        var input = `
+bar = [1, 2, 3]
+bar_0 = 4
+return bar_0
+`;
+
+        var actual = raptor.interpret(input, limits);
+        var expected = 4;
+        assert.deepEqual(actual, expected);
+      });
+
+      it('should support expression list assignments', function() {
+        var input = `
+foo = 15
+bar = [1, 2, 3]
+bar_2 = foo * 2 + 4
+return bar_2
+`;
+
+        var actual = raptor.interpret(input, limits);
+        var expected = 34;
+        assert.deepEqual(actual, expected);
+      });
+
+      it('should support deep list assignments', function() {
+        var input = `
+bar = [1, [2, [3, 4, 5]], 6]
+bar_1,1,2 = 15
+return bar_1,1,2
+`;
+
+        var actual = raptor.interpret(input, limits);
+        var expected = 15;
+        assert.deepEqual(actual, expected);
+      });
+
       it('should declare and use functions', function() {
         var input = `
 f => a {

@@ -111,7 +111,7 @@ module.exports = {
       [ extendedSpace ], rightBrace \
     ',
     'return': 'returnWord, [ space ], expression',
-    'assignment': 'identifier, [ space ], eq, [ space ], expression',
+    'assignment': 'labeledValue, [ space ], eq, [ space ], expression',
 
     // general expressions (boolean and numeric)
     'expression': 'boolTerm, { orBoolTerm } | list',
