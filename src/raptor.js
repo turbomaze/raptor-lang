@@ -3,12 +3,12 @@
 // @date 2016/08/21
 
 // dependencies
-var Interpreter = require('./interpreter.js').Interpreter;
+var Interpreter = require('./interpreter').Interpreter;
 var libraries = {
-  std: require('./libraries/std.js')
+  std: require('./libraries/std')
 };
-var grammar = require('./language/grammar.js').grammar;
-var structure = require('./language/structure.js').structure;
+var grammar = require('./language/grammar').grammar;
+var structure = require('./language/structure').structure;
 
 module.exports = function(library) {
   library = library || 'std';

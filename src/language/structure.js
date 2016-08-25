@@ -1,6 +1,6 @@
 // Raptor-lang structure
 // @author Anthony Liu
-// @date 2016/07/12
+// @date 2016/08/25
 
 // helper functions
 function binaryOperator(args) {
@@ -98,12 +98,14 @@ module.exports = {
       var identifier = args[0]; 
       var value = args[4]; 
       return {
-        'type': 'assignment', 'name': identifier, 'value': value
+        'type': 'assignment',
+        'labeledValue': identifier,
+        'value': value
       };
     },
   
     // general expressions
-    'expression': chainedBinaryOperators,
+    'expression': [chainedBinaryOperators],
     'boolTerm': chainedBinaryOperators,
     'notBoolGroup': function(args) {
       if (args[0].length > 0) {
@@ -128,23 +130,68 @@ module.exports = {
     'numExpression': chainedBinaryOperators,
     'term': chainedBinaryOperators,
     'group': [null, null, null, third],
+
+    // lists
+    'list': function(args) {
+      return (args[2].length > 0 ? args[2][0] : []);
+    },
+    'values': function(args) {
+      var struct = [args[0]];
+      var commaValues = args[1];
+      commaValues.forEach(function(commaValue) {
+        struct.push(commaValue[3]);
+      });
+      return struct;
+    },
+    'listAccess': function(args) {
+      var indices = [args[2][0]].concat(args[2][1].map(
+        function(arg) {
+          return arg[1];  
+        }
+      ));
+      return {
+        'type': 'access',
+        'name': args[0],
+        'indices': indices
+      };
+    },
   
     // keywords
     'true': function(args) { return true; },
     'false': function(args) { return false; },
   
     // basic helpers
-    'number': [
+    'decimal': function(args) {
+      var left = args[1];
+      var right = args[3];
+      var sum = left + right;
+      if (args[0].length > 0) return -sum;
+      else return sum;
+    },
+    'fractionalPart': [
       function(args) {
-        var digits = [args[1]].concat(args[2]);
+        var numZeroes = args[0].length;
+        var places = Math.ceil(Math.log10(args[1]));
+        var denominator = args[1] === 0 ? 1 : Math.pow(
+          10, numZeroes + places
+        );
+        return args[1]/denominator;
+      },
+      function(args) {return 0;}
+    ],
+    'integer': function(args) {
+      if (args[0].length > 0) return -args[1];
+      else return args[1];
+    },
+    'wholeNumber': [
+      function(args) {
+        var digits = [args[0]].concat(args[1]);
         var sum = 0;
         for (var i = 0; i < digits.length; i++) {
           var place = digits.length - i - 1;
           sum += digits[i] * Math.pow(10, place);
         }
-
-        if (args[0].length > 0) return -sum;
-        else return sum;
+        return sum;
       }
     ],
   
