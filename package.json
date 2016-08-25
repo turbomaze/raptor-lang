@@ -1,6 +1,6 @@
 {
   "name": "raptor-lang",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Raptor is an experimental functional programming language implemented in JavaScript.",
   "main": "src/raptor.js",
   "scripts": {
