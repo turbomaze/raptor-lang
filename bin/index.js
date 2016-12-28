@@ -50,11 +50,7 @@ fs.readFile(program.fileName, 'utf8', function(err, sourceCode) {
     console.log('\n=== RUNTIME STATS ===');
     console.log(JSON.stringify(stats));
   } catch (e) {
-    if (e.code === interpreter.ERR_RUNTIME) {
-      console.log('=== RUNTIME ERROR ===');
-    } else {
-      console.log('=== LIMIT ERROR ===')
-    }
+    console.log('=== oops :( ===');
     console.log(e.message);
   }
 });
