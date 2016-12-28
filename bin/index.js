@@ -15,7 +15,7 @@ var defaults = {
 // specify the program
 program
   .description('run a raptor-lang program')
-  .version('0.3.2')
+  .version('0.4.0')
   .option('-l, --library [value]', 'Add a library')
   .option('-c, --code [n]', 'Set a code limit', parseInt)
   .option('-m, --compute [n]', 'Set a compute limit', parseInt)
