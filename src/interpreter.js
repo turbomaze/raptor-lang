@@ -201,7 +201,7 @@ Interpreter.prototype.executeStatement = function(
           stats
         );
       }
-    } else if (statement in this.builtIn) {
+    } else if (statement in this.builtIns) {
       return this.runFunction(
         variables,
         {
