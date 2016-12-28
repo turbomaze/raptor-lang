@@ -318,7 +318,12 @@ Interpreter.prototype.evaluateExpression = function(
     return expression;
   } else if (Array.isArray(expression)) {
     // it's a list
-    return expression;
+    var self = this;
+    return expression.map(function(value) {
+      return self.evaluateExpression(
+        variables, value, stats
+      );
+    });
   } else {
     switch (expression.type) {
       case 'access':
