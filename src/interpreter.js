@@ -462,7 +462,7 @@ Interpreter.prototype.evaluateOperator = function(
 
     case '/':
       return handleBinaryNumericOperator(name, args, function(a, b) {
-        return Math.floor(a / b);
+        return a / b;
       });
 
     case 'or':
