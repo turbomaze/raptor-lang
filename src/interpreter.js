@@ -41,7 +41,7 @@ Interpreter.prototype.interpret = function(input, limits, stats) {
   // get the size of the AST
   var codeSize = getSizeOfAST(ast);
   if (codeSize > this.limits.code) {
-     throw {message: 'too much code', code: exports.ERR_CODE_SIZE};
+     throw {message: 'ERR: too much code', code: exports.ERR_CODE_SIZE};
   }
 
   // run it
@@ -574,7 +574,7 @@ function getLineAndPositionFromTokens(tokens, offset) {
 
 function exitIfExcessiveCompute(stats, limits) {
   if (stats['statement'] > limits.compute) {
-    throw {message: 'too much compute', code: exports.ERR_COMPUTE};
+    throw {message: 'ERR: too much compute', code: exports.ERR_COMPUTE};
   }
 }
 
